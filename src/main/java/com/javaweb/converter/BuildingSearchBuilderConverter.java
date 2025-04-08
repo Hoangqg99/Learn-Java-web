@@ -3,9 +3,12 @@ package com.javaweb.converter;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.stereotype.Component;
+
 import com.javaweb.builder.BuildingSearchBuilder;
 import com.javaweb.utils.MapUtil;
 
+@Component
 public class BuildingSearchBuilderConverter {
     public BuildingSearchBuilder toBuildingSearchBuilder(Map<String, Object> params, List<String> typeCode) {
 
@@ -14,8 +17,8 @@ public class BuildingSearchBuilderConverter {
                 .setFloorArea(MapUtil.getObject(params, "floorArea", Long.class))
                 .setWard(MapUtil.getObject(params, "ward", String.class))
                 .setStreet(MapUtil.getObject(params, "street", String.class))
-                .setDistrictcode(MapUtil.getObject(params, "districtcode", String.class))
-                .setNumberOfFloors(MapUtil.getObject(params, "numberOfFloors", Integer.class))
+                .setDistrictId(MapUtil.getObject(params, "districtId", Long.class))
+                .setNumberOfBasement(MapUtil.getObject(params, "numberOfBasement", Integer.class))
                 .setTypeCode(typeCode)
                 .setManagerName(MapUtil.getObject(params, "managerName", String.class))
                 .setManagerPhoneNumber(MapUtil.getObject(params, "managerPhoneNumber", String.class))
