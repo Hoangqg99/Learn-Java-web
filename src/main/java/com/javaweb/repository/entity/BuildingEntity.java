@@ -1,35 +1,91 @@
 package com.javaweb.repository.entity;
 
+import java.util.List;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
+import org.springframework.context.annotation.Lazy;
+
+@Entity
+@Table(name = "building")
 public class BuildingEntity {
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY) // tự động tăng dần
 	private Long id;
+	@Column(name = "name")
 	private String name;
+	@Column(name = "numberofbasement")
 	private Integer numberOfBasement;
+	@Column(name = "ward")
 	private String ward;
+	@Column(name = "street")
 	private String street;
-	private Long districtId;
+	@ManyToOne
+	@JoinColumn(name = "districtid")
+	private DistrictEntity district;
+	@Column(name = "structure")
 	private String structure;
+	@Column(name = "floorarea")
 	private Integer floorArea;
+	@Column(name = "direction")
 	private String direction;
+	@Column(name = "level")
 	private String level;
+	@Column(name = "rentprice")
 	private Integer rentPrice;
+	@Column(name = "rentpricedescription")
 	private String rentPriceDescription;
+	@Column(name = "servicefee")
 	private String serviceFee;
+	@Column(name = "carfee")
 	private String carFee;
+	@Column(name = "motorbikefee")
 	private String motorbikeFee;
+	@Column(name = "overtimefee")
 	private String overtimeFee;
+	@Column(name = "waterfee")
 	private String waterFee;
+	@Column(name = "electricityfee")
 	private String electricityFee;
+	@Column(name = "deposit")
 	private String deposit;
+	@Column(name = "payment")
 	private String payment;
+	@Column(name = "renttime")
 	private String rentTime;
+	@Column(name = "decorationtime")
 	private String decorationTime;
+	@Column(name = "brokeragefee")
 	private String brokerageFee;
+	@Column(name = "note")
 	private String note;
-	private String linkOfbuilding;
+	@Column(name = "linkofbuilding")
+	private String linkOfBuilding;
+	@Column(name = "map")
 	private String map;
+	@Column(name = "image")
 	private String image;
+	@Column(name = "managername")
 	private String managerName;
+	@Column(name = "managerphonenumber")
 	private String managerPhoneNumber;
+
+	@OneToMany(mappedBy = "buildingId", fetch = FetchType.LAZY)
+	private List<RentAreaEntity> rentArea;
+
+	@ManyToMany(mappedBy = "buildingEntities")
+	@Lazy
+	private List<RentTypeEntity> rentTypeEntities;
 
 	public String getName() {
 		return name;
@@ -207,12 +263,12 @@ public class BuildingEntity {
 		this.note = note;
 	}
 
-	public String getLinkOfbuilding() {
-		return linkOfbuilding;
+	public String getLinkOfBuilding() {
+		return linkOfBuilding;
 	}
 
-	public void setLinkOfbuilding(String linkOfbuilding) {
-		this.linkOfbuilding = linkOfbuilding;
+	public void setLinkOfBuilding(String linkOfBuilding) {
+		this.linkOfBuilding = linkOfBuilding;
 	}
 
 	public String getMap() {
@@ -255,12 +311,20 @@ public class BuildingEntity {
 		this.id = id;
 	}
 
-	public Long getDistrictId() {
-		return districtId;
+	public DistrictEntity getDistrict() {
+		return district;
 	}
 
-	public void setDistrictId(Long districtId) {
-		this.districtId = districtId;
+	public void setDistrict(DistrictEntity district) {
+		this.district = district;
+	}
+
+	public List<RentAreaEntity> getRentArea() {
+		return rentArea;
+	}
+
+	public void setRentArea(List<RentAreaEntity> rentArea) {
+		this.rentArea = rentArea;
 	}
 
 }
