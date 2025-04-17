@@ -20,10 +20,13 @@ public class RentTypeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(name = "code")
     private String code;
+
     @Column(name = "value")
     private Integer value;
+
     @ManyToMany
     @Lazy
     @JoinTable(name = "buildingrenttype", joinColumns = @JoinColumn(name = "renttypeid", nullable = false, referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "buildingid", nullable = false, referencedColumnName = "id"))

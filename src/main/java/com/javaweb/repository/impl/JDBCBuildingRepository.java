@@ -2,12 +2,17 @@ package com.javaweb.repository.impl;
 
 import java.lang.reflect.Field;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import javax.persistence.Query;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
@@ -22,14 +27,17 @@ import com.javaweb.utils.ConnectionJDBCUtil;
 @PropertySource("classpath:application.properties")
 public class JDBCBuildingRepository implements BuildingRepository {
 
-	@Value("${spring.datasource.url}")
-	private String DB_URL;
+	@PersistenceContext
+	private EntityManager entityManager;
 
-	@Value("${spring.datasource.username}")
-	private String USER;
+	// @Value("${spring.datasource.url}")
+	// private String DB_URL;
 
-	@Value("${spring.datasource.password}")
-	private String PASS;
+	// @Value("${spring.datasource.username}")
+	// private String USER;
+
+	// @Value("${spring.datasource.password}")
+	// private String PASS;
 
 	public static void joinTable(BuildingSearchBuilder buildingSearchBuilder, StringBuilder sql) {
 		Long staffId = buildingSearchBuilder.getStaffId();
@@ -120,34 +128,37 @@ public class JDBCBuildingRepository implements BuildingRepository {
 		where.append(" GROUP BY b.id");
 		sql.append(where);
 
-		List<BuildingEntity> result = new ArrayList<>();
-		try (
-				// Connection conn = getConnection();
-				Connection conn = ConnectionJDBCUtil.getConnection();
-				PreparedStatement pstmt = conn.prepareStatement(sql.toString());
-				ResultSet rs = pstmt.executeQuery()) {
+		Query query = entityManager.createNativeQuery(sql.toString(), BuildingEntity.class);
+		return query.getResultList();
 
-			while (rs.next()) {
-				BuildingEntity buildingEntity = new BuildingEntity();
-				buildingEntity.setId(rs.getLong("id"));
-				buildingEntity.setName(rs.getString("name"));
-				buildingEntity.setStreet(rs.getString("street"));
-				buildingEntity.setWard(rs.getString("ward"));
-				buildingEntity.setServiceFee(rs.getString("servicefee"));
-				buildingEntity.setBrokerageFee(rs.getString("brokeragefee"));
-				// buildingEntity.setDistrictId(rs.getLong("districtid"));
-				buildingEntity.setRentPrice(rs.getInt("rentprice"));
-				buildingEntity.setFloorArea(rs.getInt("floorarea"));
-				buildingEntity.setManagerName(rs.getString("managername"));
-				buildingEntity.setManagerPhoneNumber(rs.getString("managerphonenumber"));
-				result.add(buildingEntity);
-			}
-
-		} catch (SQLException ex) {
-			ex.printStackTrace();
-		}
-		return result;
 	}
+
+	// List<BuildingEntity> result = new ArrayList<>();
+	// try (
+	// Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+	// // Connection conn = ConnectionJDBCUtil.getConnection();
+	// PreparedStatement pstmt = conn.prepareStatement(sql.toString());
+	// ResultSet rs = pstmt.executeQuery()) {
+
+	// while (rs.next()) {
+	// BuildingEntity buildingEntity = new BuildingEntity();
+	// buildingEntity.setId(rs.getLong("id"));
+	// buildingEntity.setName(rs.getString("name"));
+	// buildingEntity.setStreet(rs.getString("street"));
+	// buildingEntity.setWard(rs.getString("ward"));
+	// // buildingEntity.setDistrictId(rs.getLong("districtid"));
+	// buildingEntity.setRentPrice(rs.getInt("rentprice"));
+	// buildingEntity.setFloorArea(rs.getInt("floorarea"));
+	// buildingEntity.setManagerName(rs.getString("managername"));
+	// buildingEntity.setManagerPhoneNumber(rs.getString("managerphonenumber"));
+	// result.add(buildingEntity);
+	// }
+	// }catch(
+	// SQLException ex)
+	// {
+	// ex.printStackTrace();
+	// }return result;
+	// }
 
 	@Override
 	public void DeleteById(long id) {

@@ -17,8 +17,10 @@ public class DistrictEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY) // tự động tăng dần
 	private Long id;
+
 	@Column(name = "code")
 	private String code;
+
 	@Column(name = "name")
 	private String name;
 

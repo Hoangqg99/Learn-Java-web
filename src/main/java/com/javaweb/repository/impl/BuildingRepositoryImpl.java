@@ -28,13 +28,15 @@ public class BuildingRepositoryImpl implements BuildingRepository {
 	public List<BuildingEntity> findAll(BuildingSearchBuilder buildingSearchBuilder) {
 
 		// JPQL : JPA Query Language
-		// String sql = "FROM BuildingEntity b Where b.id = 1 ";
+		// Làm việc trực tiếp với entity thay vì trực tiếp csdl
+		// String sql = "FROM BuildingEntity b Where b.name Like '%building%' ";
 		// Query query = entityManager.createQuery(sql, BuildingEntity.class);
-		// return query.getResultList();
 
 		// SQL Native
+		// Câu lệnh thuần sql
 		String sql = "SELECT b.* FROM building b WHERE b.name like '%building%' ";
 		Query query = entityManager.createNativeQuery(sql, BuildingEntity.class);
+
 		return query.getResultList();
 	}
 
@@ -43,48 +45,3 @@ public class BuildingRepositoryImpl implements BuildingRepository {
 
 	}
 }
-
-// StringBuilder sql = new StringBuilder("SELECT b.* FROM building b WHERE
-// 1=1");
-
-// if (buildingSearchBuilder != null) {
-// if (buildingSearchBuilder.getName() != null) {
-// sql.append(" AND b.name LIKE :name");
-// }
-// if (buildingSearchBuilder.getDistrictId() != null) {
-// sql.append(" AND b.districtid = :districtId");
-// }
-// if (buildingSearchBuilder.getFloorArea() != null) {
-// sql.append(" AND b.floorarea = :floorArea");
-// }
-// if (buildingSearchBuilder.getRentPriceForm() != null) {
-// sql.append(" AND b.rentprice >= :rentPriceFrom");
-// }
-// if (buildingSearchBuilder.getRentPriceTo() != null) {
-// sql.append(" AND b.rentprice <= :rentPriceTo");
-// }
-// }
-
-// Query query = entityManager.createNativeQuery(sql.toString(),
-// BuildingEntity.class);
-
-// if (buildingSearchBuilder != null) {
-// if (buildingSearchBuilder.getName() != null) {
-// query.setParameter("name", "%" + buildingSearchBuilder.getName() + "%");
-// }
-// if (buildingSearchBuilder.getDistrictId() != null) {
-// query.setParameter("districtId", buildingSearchBuilder.getDistrictId());
-// }
-// if (buildingSearchBuilder.getFloorArea() != null) {
-// query.setParameter("floorArea", buildingSearchBuilder.getFloorArea());
-// }
-// if (buildingSearchBuilder.getRentPriceForm() != null) {
-// query.setParameter("rentPriceFrom",
-// buildingSearchBuilder.getRentPriceForm());
-// }
-// if (buildingSearchBuilder.getRentPriceTo() != null) {
-// query.setParameter("rentPriceTo", buildingSearchBuilder.getRentPriceTo());
-// }
-// }
-
-// return query.getResultList();

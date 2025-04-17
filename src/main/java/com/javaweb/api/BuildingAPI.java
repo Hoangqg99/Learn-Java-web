@@ -13,7 +13,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.javaweb.model.BuildingDTO;
+import com.javaweb.model.BuildingRequestDTO;
+import com.javaweb.repository.entity.BuildingEntity;
+import com.javaweb.repository.entity.DistrictEntity;
 import com.javaweb.service.BuildingService;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.transaction.Transactional;
+import org.springframework.web.bind.annotation.PutMapping;
 
 @RestController
 @PropertySource("classpath:application.properties")
@@ -24,6 +33,9 @@ public class BuildingAPI {
 	@Value("${dev.nguyen}")
 	private String data;
 
+	@PersistenceContext
+	private EntityManager entityManager;
+
 	@GetMapping(value = "/api/building/")
 	public List<BuildingDTO> getBuilding(
 			@RequestParam Map<String, Object> params,
@@ -32,9 +44,46 @@ public class BuildingAPI {
 		return result;
 	}
 
+	// Code Xuống BuildingRepositoryImpl tầng repository
+	@PostMapping(value = "/api/building/")
+	@Transactional
+	public void creatBuilding(@RequestBody BuildingRequestDTO buildingRequestDTO) {
+		BuildingEntity buildingEntity = new BuildingEntity();
+		buildingEntity.setName(buildingRequestDTO.getName());
+		buildingEntity.setStreet(buildingRequestDTO.getStreet());
+		buildingEntity.setWard(buildingRequestDTO.getWard());
+		DistrictEntity districtEntity = new DistrictEntity();
+		districtEntity.setId(buildingRequestDTO.getDistrictid());
+		buildingEntity.setDistrict(districtEntity);
+		entityManager.persist(buildingEntity); // insert
+		System.out.println("vbri");
+	}
+
+	@PutMapping(value = "/api/building/")
+	@Transactional
+	public void updateBuilding(@RequestBody BuildingRequestDTO buildingRequestDTO) {
+		BuildingEntity buildingEntity = new BuildingEntity();
+		// buildingEntity.setId(1L);
+		buildingEntity.setId(buildingRequestDTO.getId());
+		buildingEntity.setName(buildingRequestDTO.getName());
+		buildingEntity.setStreet(buildingRequestDTO.getStreet());
+		buildingEntity.setWard(buildingRequestDTO.getWard());
+		DistrictEntity districtEntity = new DistrictEntity();
+		districtEntity.setId(buildingRequestDTO.getDistrictid());
+		buildingEntity.setDistrict(districtEntity);
+		entityManager.merge(buildingEntity); // update
+		System.out.println("abc");
+	}
+
 	@DeleteMapping(value = "api/building/{id}")
-	public void deleteBuilding(@PathVariable Integer id) {
-		System.out.println(data);
+	@Transactional
+	public void deleteBuilding(@PathVariable Long[] id) {
+		for (Long buildingId : id) {
+			BuildingEntity buildingEntity = entityManager.find(BuildingEntity.class, buildingId);
+			if (buildingEntity != null) {
+				entityManager.remove(buildingEntity);
+			}
+		}
 	}
 
 }
