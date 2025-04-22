@@ -1,5 +1,10 @@
 package com.javaweb.model;
 
+// import lombok.Getter;
+// import lombok.Setter;
+
+// @Getter
+// @Setter
 public class DistrictDTO {
     private Long id;
     private String name;
@@ -28,4 +33,5 @@ public class DistrictDTO {
     public void setCode(String code) {
         this.code = code;
     }
+
 }
