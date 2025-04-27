@@ -26,16 +26,30 @@ public class BuildingDTOConverter {
     @Autowired
     private ModelMapper modelMapper;
 
-    public BuildingDTO toBuildingDTO(BuildingEntity item) {
-        BuildingDTO building = modelMapper.map(item, BuildingDTO.class);
-        building.setName(item.getName());
-        DistrictEntity districtEntity = districtRepository.findNameById(item.getDistrictId());
-        building.setAddress(item.getStreet() + "," + item.getWard() + "," + districtEntity.getName());
-        List<RentAreaEntity> rentAreas = rentAreaRepository.getValueByBuildingId(item.getId());
-        String areaResult = rentAreas.stream().map(it -> it.getValue().toString()).collect(Collectors.joining(","));
+    // public BuildingDTO toBuildingDTO(BuildingEntity item) {
+    // BuildingDTO building = modelMapper.map(item, BuildingDTO.class);
+    // building.setName(item.getName());
+    // DistrictEntity districtEntity =
+    // districtRepository.findNameById(item.getDistrictId());
+    // building.setAddress(item.getStreet() + "," + item.getWard() + "," +
+    // districtEntity.getName());
+    // List<RentAreaEntity> rentAreas =
+    // rentAreaRepository.getValueByBuildingId(item.getId());
+    // String areaResult = rentAreas.stream().map(it ->
+    // it.getValue().toString()).collect(Collectors.joining(","));
 
-        building.setRentArea(areaResult);
+    // building.setRentArea(areaResult);
 
+    // return building;
+    public BuildingDTO toBuildingDTO(BuildingEntity buildingEntity) {
+
+        BuildingDTO building = modelMapper.map(buildingEntity, BuildingDTO.class);
+        DistrictEntity district = districtRepository.findNameById(buildingEntity.getDistrictId());
+        building.setAddress(buildingEntity.getStreet() + ", " + buildingEntity.getWard() + ", " + district.getName());
+        List<RentAreaEntity> rentAreaList = rentAreaRepository.getValueByBuildingId(buildingEntity.getId());
+        String rentArea = rentAreaList.stream().map(RentAreaEntity::getValue).map(item -> String.valueOf(item))
+                .collect(Collectors.joining(","));
+        building.setRentArea(rentArea);
         return building;
     }
 

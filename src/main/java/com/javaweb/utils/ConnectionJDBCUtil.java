@@ -4,6 +4,11 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
+
+@PropertySource("classpath:application.properties")
+
 public class ConnectionJDBCUtil {
     static final String DB_URL = "jdbc:mysql://localhost:3306/estatebasic";
     static final String USER = "root";
@@ -17,7 +22,5 @@ public class ConnectionJDBCUtil {
             e.printStackTrace();
         }
         return conn;
-
     }
-
 }
