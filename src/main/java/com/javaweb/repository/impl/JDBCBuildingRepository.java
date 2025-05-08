@@ -15,6 +15,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Repository;
 
@@ -23,10 +24,11 @@ import com.javaweb.repository.BuildingRepository;
 import com.javaweb.repository.entity.BuildingEntity;
 import com.javaweb.utils.ConnectionJDBCUtil;
 
+// @Primary
 @Repository
 @PropertySource("classpath:application.properties")
-public class JDBCBuildingRepository implements BuildingRepository {
 
+public class JDBCBuildingRepository implements BuildingRepository {
 	@PersistenceContext
 	private EntityManager entityManager;
 
@@ -57,18 +59,19 @@ public class JDBCBuildingRepository implements BuildingRepository {
 			for (Field item : fields) {
 				item.setAccessible(true);
 				String fieldName = item.getName();
-				if (!fieldName.equals("staffId") && !fieldName.equals("typeCode")
-						&& !fieldName.startsWith("area") && !fieldName.startsWith("rentPrice")) {
-					Object value = item.get(buildingSearchBuilder);
-					if (value != null) {
-						if (item.getType().getName().equals("java.lang.Long")
-								|| item.getType().getName().equals("java.lang.Integer")) {
-							where.append(" AND b.").append(fieldName).append(" = ").append(value);
-						} else if (item.getType().getName().equals("java.lang.String")) {
-							where.append(" AND b.").append(fieldName).append(" LIKE '%").append(value).append("%' ");
-						}
+				if (item != null) {
+					String columnName = fieldName;
+					if (fieldName.equals("districtId")) {
+						columnName = "districtid"; // tránh lỗi vì DB thường viết snake_case
+					}
+					if (item.getType().getName().equals("java.lang.Long")
+							|| item.getType().getName().equals("java.lang.Integer")) {
+						where.append(" AND b.").append(columnName).append(" = ").append(item);
+					} else if (item.getType().getName().equals("java.lang.String")) {
+						where.append(" AND b.").append(columnName).append(" LIKE '%").append(item).append("%' ");
 					}
 				}
+
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
