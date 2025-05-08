@@ -2,6 +2,7 @@ package com.javaweb.model;
 
 public class BuildingDTO {
 	private String name;
+	private Long districtId;
 	private Integer numberOfBasement;
 	private String address;
 	private String managerName;
@@ -99,6 +100,14 @@ public class BuildingDTO {
 
 	public void setFreeSpace(Integer freeSpace) {
 		this.freeSpace = freeSpace;
+	}
+
+	public Long getDistrictId() {
+		return districtId;
+	}
+
+	public void setDistrictId(Long districtId) {
+		this.districtId = districtId;
 	}
 
 }
