@@ -12,7 +12,7 @@ public class BuildingSearchBuilder {
     private Integer numberOfBasement;
     private List<String> typeCode = new ArrayList<>();
     private String managerName;
-    private String managerPhoneNumber;
+    private Long managerPhoneNumber;
     private Long rentPriceForm;
     private Long rentPriceTo;
     private Long areaFrom;
@@ -68,7 +68,7 @@ public class BuildingSearchBuilder {
         return managerName;
     }
 
-    public String getManagerPhoneNumber() {
+    public Long getManagerPhoneNumber() {
         return managerPhoneNumber;
     }
 
@@ -101,7 +101,7 @@ public class BuildingSearchBuilder {
         private Integer numberOfBasement;
         private List<String> typeCode = new ArrayList<>();
         private String managerName;
-        private String managerPhoneNumber;
+        private Long managerPhoneNumber;
         private Long rentPriceForm;
         private Long rentPriceTo;
         private Long areaFrom;
@@ -148,7 +148,7 @@ public class BuildingSearchBuilder {
             return this;
         }
 
-        public Builder setManagerPhoneNumber(String managerPhoneNumber) {
+        public Builder setManagerPhoneNumber(Long managerPhoneNumber) {
             this.managerPhoneNumber = managerPhoneNumber;
             return this;
         }

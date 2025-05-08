@@ -1,168 +1,153 @@
 package com.javaweb.repository.custom.impl;
 
 import java.lang.reflect.Field;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.persistence.Query;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Repository;
 
 import com.javaweb.builder.BuildingSearchBuilder;
 import com.javaweb.repository.BuildingRepository;
 import com.javaweb.repository.custom.BuildingRepositoryCustom;
 import com.javaweb.repository.entity.BuildingEntity;
-import com.javaweb.utils.ConnectionJDBCUtil;
+import com.javaweb.utils.NumberUtil;
+import com.javaweb.utils.StringUtil;
 
 @Repository
+
+// Có hai file impl BuildingRepository file này + file JDBCRepositoryImpl
+// Câu lệnh ưu tiên chọn giữa hai file
 @Primary
-@PropertySource("classpath:application.properties")
+
 public class BuildingRepositoryImpl implements BuildingRepositoryCustom {
 
     @PersistenceContext
     private EntityManager entityManager;
 
-    @Value("${spring.datasource.url}")
-    private String DB_URL;
+    @Override
+    // public List<BuildingEntity> findAll(BuildingSearchBuilder
+    // buildingSearchBuilder) {
 
-    @Value("${spring.datasource.username}")
-    private String USER;
+    // // JPQL : JPA Query Language
+    // // Làm việc trực tiếp với entity thay vì trực tiếp csdl
+    // // String sql = "FROM BuildingEntity b Where b.name Like '%building%' ";
+    // // Query query = entityManager.createQuery(sql, BuildingEntity.class);
 
-    @Value("${spring.datasource.password}")
-    private String PASS;
+    // // SQL Native
+    // // Câu lệnh thuần sql
+    // String sql = "SELECT b.* FROM building b WHERE b.name like '%building%' ";
+    // Query query = entityManager.createNativeQuery(sql, BuildingEntity.class);
 
-    public static void joinTable(BuildingSearchBuilder buildingSearchBuilder, StringBuilder sql) {
-        Long staffId = buildingSearchBuilder.getStaffId();
-        if (staffId != null) {
-            sql.append(" INNER JOIN assignmentbuilding ON b.id = assignmentbuilding.buildingid ");
+    // return query.getResultList();
+    // }
+
+    public List<BuildingEntity> findAll(BuildingSearchBuilder buildingSearchBuilder) {
+        StringBuilder sql = new StringBuilder("SELECT b.* FROM building b ");
+        joinTable(buildingSearchBuilder, sql);
+        where_condition_normal(buildingSearchBuilder, sql);
+        where_condition_special(sql, buildingSearchBuilder);
+        Query query = entityManager.createNativeQuery(sql.toString(), BuildingEntity.class);
+        return query.getResultList();
+    }
+
+    private void joinTable(BuildingSearchBuilder buildingSearchBuilder, StringBuilder sql) {
+        if (buildingSearchBuilder.getTypeCode() != null && !buildingSearchBuilder.getTypeCode().isEmpty()) {
+            sql.append(" INNER JOIN buildingrenttype ON buildingrenttype.buildingId = b.id ");
+            sql.append(" INNER JOIN renttype ON renttype.id = buildingrenttype.renttypeId ");
         }
-        List<String> typeCode = buildingSearchBuilder.getTypeCode();
-        if (typeCode != null && typeCode.size() != 0) {
-            sql.append(" INNER JOIN buildingrenttype ON b.id = buildingrenttype.buildingid ");
-            sql.append(" INNER JOIN renttype ON renttype.id = buildingrenttype.renttypeid ");
+        if (buildingSearchBuilder.getStaffId() != null) {
+            sql.append(" INNER JOIN assignmentbuilding ON b.id = assignmentbuilding.buildingid ");
         }
     }
 
-    public static void queryNormal(BuildingSearchBuilder buildingSearchBuilder, StringBuilder where) {
+    private void where_condition_normal(BuildingSearchBuilder buildingSearchBuilder, StringBuilder sql) {
+        sql.append(" WHERE 1 = 1 ");
         try {
-            Field[] fields = BuildingSearchBuilder.class.getDeclaredFields();
-            for (Field item : fields) {
-                item.setAccessible(true);
-                String fieldName = item.getName();
-                if (!fieldName.equals("staffId") && !fieldName.equals("typeCode")
-                        && !fieldName.startsWith("area") && !fieldName.startsWith("rentPrice")) {
-                    Object value = item.get(buildingSearchBuilder);
-                    if (value != null) {
-                        if (item.getType().getName().equals("java.lang.Long")
-                                || item.getType().getName().equals("java.lang.Integer")) {
-                            where.append(" AND b.").append(fieldName).append(" = ").append(value);
-                        } else if (item.getType().getName().equals("java.lang.String")) {
-                            where.append(" AND b.").append(fieldName).append(" LIKE '%").append(value).append("%' ");
+            Field[] feilds = BuildingSearchBuilder.class.getDeclaredFields();
+            for (Field feild : feilds) {
+                feild.setAccessible(true);
+                String key = feild.getName().trim();
+                if (!key.toLowerCase().startsWith("area") && !key.equalsIgnoreCase("typeCode")) {
+                    String value = feild.get(buildingSearchBuilder) == null ? null
+                            : feild.get(buildingSearchBuilder).toString();
+                    if (StringUtil.checkString(value)) {
+                        if (key.equalsIgnoreCase("numberOfBasement")) {
+                            Integer numberOfBasement = Integer.parseInt(value);
+                            sql.append(" AND b.numberOfBasement = ").append(numberOfBasement);
+                        } else if (key.equalsIgnoreCase("staffId")) {
+                            Long staffId = Long.parseLong(value);
+                            sql.append(" AND assignmentbuilding.staffId = ").append(staffId);
+                        } else if (key.startsWith("rentPrice")) {
+                            Integer rentPrice = Integer.parseInt(value);
+                            if (key.endsWith("From")) {
+                                sql.append(" AND b.rentPrice >= ").append(rentPrice);
+                            } else {
+                                sql.append(" AND b.rentPrice <= ").append(rentPrice);
+                            }
+                        } else if (NumberUtil.isNumber(value)) {
+                            if (key.equalsIgnoreCase("districtId")) {
+                                Long districtId = Long.parseLong(value);
+                                sql.append(" AND b.districtId = ").append(districtId);
+                            } else if (key.equalsIgnoreCase("managerPhoneNumber")) {
+                                Long managerPhoneNumber = Long.parseLong(value);
+                                sql.append(" AND b.managerPhoneNumber = ").append(managerPhoneNumber);
+                            } else if (key.equalsIgnoreCase("floorarea")) {
+                                Long floorarea = Long.parseLong(value);
+                                sql.append(" AND b.floorarea = ").append(floorarea);
+                            }
+                        } else if (!key.equalsIgnoreCase("typeCode")) {
+                            sql.append(" AND b.").append(key).append(" LIKE '%").append(value).append("%'");
                         }
                     }
                 }
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
+            System.out.println(ex.getMessage());
         }
     }
 
-    public static void querySpecial(BuildingSearchBuilder buildingSearchBuilder, StringBuilder where) {
-        Long staffId = buildingSearchBuilder.getStaffId();
-        if (staffId != null) {
-            where.append(" AND assignmentbuilding.staffid = ").append(staffId);
+    private void where_condition_special(StringBuilder sql, BuildingSearchBuilder buildingSearchBuilder) {
+        Long areaFrom = buildingSearchBuilder.getAreaFrom();
+        Long areaTo = buildingSearchBuilder.getAreaTo();
+        if (areaFrom != null || areaTo != null) {
+            sql.append(" AND EXISTS (SELECT rentarea.value FROM rentarea WHERE rentarea.buildingid = b.id ");
+            if (areaFrom != null) {
+                sql.append(" AND rentarea.value >= ").append(areaFrom);
+            }
+            if (areaTo != null) {
+                sql.append(" AND rentarea.value <= ").append(areaTo);
+            }
+            sql.append(" ) ");
         }
-        Long rentAreaTo = buildingSearchBuilder.getAreaTo();
-        Long rentAreaFrom = buildingSearchBuilder.getAreaFrom();
-        if (rentAreaFrom != null || rentAreaTo != null) {
-            where.append(" AND EXISTS (SELECT * FROM rentarea r WHERE b.id = r.buildingid ");
-            if (rentAreaFrom != null) {
-                where.append(" AND r.value >= ").append(rentAreaFrom);
-            }
-            if (rentAreaTo != null) {
-                where.append(" AND r.value <= ").append(rentAreaTo);
-            }
-            where.append(" ) ");
-        }
-
-        Long rentPriceTo = buildingSearchBuilder.getRentPriceTo();
-        Long rentPriceFrom = buildingSearchBuilder.getRentPriceForm();
-        if (rentPriceFrom != null || rentPriceTo != null) {
-            if (rentPriceFrom != null) {
-                where.append(" AND b.rentprice >= ").append(rentPriceFrom);
-            }
-            if (rentPriceTo != null) {
-                where.append(" AND b.rentprice <= ").append(rentPriceTo);
-            }
-        }
-
         List<String> typeCode = buildingSearchBuilder.getTypeCode();
-        if (typeCode != null && !typeCode.isEmpty()) {
-            where.append(" AND (");
-            String sql = typeCode.stream()
-                    .map(it -> "renttype.code LIKE '%" + it + "%'")
-                    .collect(Collectors.joining(" OR "));
-            where.append(sql);
-            where.append(") ");
+        if (typeCode != null && typeCode.size() > 0) {
+            String typeSQL = String.join(", ",
+                    typeCode.stream().map(item -> "'" + item + "'").collect(Collectors.toList()));
+            sql.append(" AND renttype.code IN ( " + typeSQL + " ) ");
         }
+        sql.append(" GROUP BY b.id");
     }
 
     @Override
-    public List<BuildingEntity> findAll(BuildingSearchBuilder buildingSearchBuilder) {
-        StringBuilder sql = new StringBuilder(
-                "SELECT b.id, b.name, b.districtid, b.street, b.floorarea, b.ward, " +
-                        "b.numberofbasement, b.managername, b.managerphonenumber, " +
-                        "b.rentprice, b.servicefee, b.brokeragefee FROM building b ");
-        joinTable(buildingSearchBuilder, sql);
-        StringBuilder where = new StringBuilder(" WHERE 1=1 ");
-        queryNormal(buildingSearchBuilder, where);
-        querySpecial(buildingSearchBuilder, where);
-        where.append(" GROUP BY b.id");
-        sql.append(where);
-
-        // Query query = entityManager.createNativeQuery(sql.toString(),
-        // BuildingEntity.class);
-        // return query.getResultList();
-
-        List<BuildingEntity> result = new ArrayList<>();
-        try (
-                Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
-                // Connection conn = ConnectionJDBCUtil.getConnection();
-                PreparedStatement pstmt = conn.prepareStatement(sql.toString());
-                ResultSet rs = pstmt.executeQuery()) {
-
-            while (rs.next()) {
-                BuildingEntity buildingEntity = new BuildingEntity();
-                buildingEntity.setId(rs.getLong("id"));
-                buildingEntity.setName(rs.getString("name"));
-                buildingEntity.setStreet(rs.getString("street"));
-                buildingEntity.setWard(rs.getString("ward"));
-                // buildingEntity.setDistrictId(rs.getLong("districtid"));
-                buildingEntity.setRentPrice(rs.getInt("rentprice"));
-                buildingEntity.setFloorArea(rs.getInt("floorarea"));
-                buildingEntity.setManagerName(rs.getString("managername"));
-                buildingEntity.setManagerPhoneNumber(rs.getString("managerphonenumber"));
-                result.add(buildingEntity);
-            }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
-        return result;
+    public void DeleteById(Long id) {
     }
 
-    // @Override
-    public void DeleteById(long id) {
-        // TODO: Implement delete logic
+    @Override
+    public void deleteByIdIn(Long[] ids) {
+    }
+
+    @Override
+    public List<BuildingEntity> findByNameContaining(String name) {
+        return null;
+    }
+
+    @Override
+    public List<BuildingEntity> findByNameContainingAndStreet(String name, String street) {
+        return null;
     }
 }
