@@ -1,5 +1,11 @@
 package com.javaweb.model;
 
+// import lombok.Getter;
+// import lombok.Setter;
+
+// @Getter
+// @Setter
+
 public class BuildingDTO {
 	private String name;
 	private Integer numberOfBasement;
@@ -10,6 +16,7 @@ public class BuildingDTO {
 	private String rentArea;
 	private String brokerageFee;
 	private String serviceFee;
+	private String street;
 	private Integer rentPrice;
 	private Integer freeSpace;
 
@@ -55,6 +62,14 @@ public class BuildingDTO {
 
 	public Integer getFloorArea() {
 		return floorArea;
+	}
+
+	public String getStreet() {
+		return street;
+	}
+
+	public void setStreet(String street) {
+		this.street = street;
 	}
 
 	public void setFloorArea(Integer floorArea) {

@@ -1,35 +1,89 @@
 package com.javaweb.repository.entity;
 
+import java.util.List;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
+import org.springframework.context.annotation.Lazy;
+
+// import lombok.Getter;
+// import lombok.Setter;
+
+@Entity
+@Table(name = "building")
+// @Getter
+// @Setter
 public class BuildingEntity {
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY) // tự động tăng dần
 	private Long id;
+
+	@Column(name = "name")
 	private String name;
+
+	@Column(name = "numberofbasement")
 	private Integer numberOfBasement;
+
+	@Column(name = "ward")
 	private String ward;
+
+	@Column(name = "street")
 	private String street;
-	private Long districtId;
-	private String structure;
+
+	@ManyToOne
+	@JoinColumn(name = "districtid")
+	private DistrictEntity district;
+
+	@Column(name = "floorarea")
 	private Integer floorArea;
-	private String direction;
-	private String level;
+
+	@Column(name = "rentprice")
 	private Integer rentPrice;
-	private String rentPriceDescription;
-	private String serviceFee;
-	private String carFee;
-	private String motorbikeFee;
-	private String overtimeFee;
-	private String waterFee;
-	private String electricityFee;
-	private String deposit;
-	private String payment;
-	private String rentTime;
-	private String decorationTime;
-	private String brokerageFee;
-	private String note;
-	private String linkOfbuilding;
-	private String map;
-	private String image;
+
+	@Column(name = "managername")
 	private String managerName;
+
+	@Column(name = "managerphonenumber")
 	private String managerPhoneNumber;
+
+	@Column(name = "servicefee")
+	private String servicefee;
+
+	@Column(name = "brokeragefee")
+	private String brokeragefee;
+
+	@OneToMany(mappedBy = "buildingId", fetch = FetchType.LAZY)
+	private List<RentAreaEntity> rentArea;
+
+	@ManyToMany(mappedBy = "buildingEntities")
+	@Lazy
+	private List<RentTypeEntity> rentTypeEntities;
+
+	public String getBrokeragefee() {
+		return brokeragefee;
+	}
+
+	public void setBrokeragefee(String brokeragefee) {
+		this.brokeragefee = brokeragefee;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
 
 	public String getName() {
 		return name;
@@ -63,12 +117,12 @@ public class BuildingEntity {
 		this.street = street;
 	}
 
-	public String getStructure() {
-		return structure;
+	public DistrictEntity getDistrict() {
+		return district;
 	}
 
-	public void setStructure(String structure) {
-		this.structure = structure;
+	public void setDistrict(DistrictEntity district) {
+		this.district = district;
 	}
 
 	public Integer getFloorArea() {
@@ -79,156 +133,12 @@ public class BuildingEntity {
 		this.floorArea = floorArea;
 	}
 
-	public String getDirection() {
-		return direction;
-	}
-
-	public void setDirection(String direction) {
-		this.direction = direction;
-	}
-
-	public String getLevel() {
-		return level;
-	}
-
-	public void setLevel(String level) {
-		this.level = level;
-	}
-
 	public Integer getRentPrice() {
 		return rentPrice;
 	}
 
 	public void setRentPrice(Integer rentPrice) {
 		this.rentPrice = rentPrice;
-	}
-
-	public String getRentPriceDescription() {
-		return rentPriceDescription;
-	}
-
-	public void setRentPriceDescription(String rentPriceDescription) {
-		this.rentPriceDescription = rentPriceDescription;
-	}
-
-	public String getServiceFee() {
-		return serviceFee;
-	}
-
-	public void setServiceFee(String serviceFee) {
-		this.serviceFee = serviceFee;
-	}
-
-	public String getCarFee() {
-		return carFee;
-	}
-
-	public void setCarFee(String carFee) {
-		this.carFee = carFee;
-	}
-
-	public String getMotorbikeFee() {
-		return motorbikeFee;
-	}
-
-	public void setMotorbikeFee(String motorbikeFee) {
-		this.motorbikeFee = motorbikeFee;
-	}
-
-	public String getOvertimeFee() {
-		return overtimeFee;
-	}
-
-	public void setOvertimeFee(String overtimeFee) {
-		this.overtimeFee = overtimeFee;
-	}
-
-	public String getWaterFee() {
-		return waterFee;
-	}
-
-	public void setWaterFee(String waterFee) {
-		this.waterFee = waterFee;
-	}
-
-	public String getElectricityFee() {
-		return electricityFee;
-	}
-
-	public void setElectricityFee(String electricityFee) {
-		this.electricityFee = electricityFee;
-	}
-
-	public String getDeposit() {
-		return deposit;
-	}
-
-	public void setDeposit(String deposit) {
-		this.deposit = deposit;
-	}
-
-	public String getPayment() {
-		return payment;
-	}
-
-	public void setPayment(String payment) {
-		this.payment = payment;
-	}
-
-	public String getRentTime() {
-		return rentTime;
-	}
-
-	public void setRentTime(String rentTime) {
-		this.rentTime = rentTime;
-	}
-
-	public String getDecorationTime() {
-		return decorationTime;
-	}
-
-	public void setDecorationTime(String decorationTime) {
-		this.decorationTime = decorationTime;
-	}
-
-	public String getBrokerageFee() {
-		return brokerageFee;
-	}
-
-	public void setBrokerageFee(String brokerageFee) {
-		this.brokerageFee = brokerageFee;
-	}
-
-	public String getNote() {
-		return note;
-	}
-
-	public void setNote(String note) {
-		this.note = note;
-	}
-
-	public String getLinkOfbuilding() {
-		return linkOfbuilding;
-	}
-
-	public void setLinkOfbuilding(String linkOfbuilding) {
-		this.linkOfbuilding = linkOfbuilding;
-	}
-
-	public String getMap() {
-		return map;
-	}
-
-	public void setMap(String map) {
-		this.map = map;
-	}
-
-	public String getImage() {
-		return image;
-	}
-
-	public void setImage(String image) {
-		this.image = image;
 	}
 
 	public String getManagerName() {
@@ -247,20 +157,28 @@ public class BuildingEntity {
 		this.managerPhoneNumber = managerPhoneNumber;
 	}
 
-	public Long getId() {
-		return id;
+	public List<RentAreaEntity> getRentArea() {
+		return rentArea;
 	}
 
-	public void setId(Long id) {
-		this.id = id;
+	public void setRentArea(List<RentAreaEntity> rentArea) {
+		this.rentArea = rentArea;
 	}
 
-	public Long getDistrictId() {
-		return districtId;
+	public List<RentTypeEntity> getRentTypeEntities() {
+		return rentTypeEntities;
 	}
 
-	public void setDistrictId(Long districtId) {
-		this.districtId = districtId;
+	public void setRentTypeEntities(List<RentTypeEntity> rentTypeEntities) {
+		this.rentTypeEntities = rentTypeEntities;
+	}
+
+	public String getServicefee() {
+		return servicefee;
+	}
+
+	public void setServicefee(String servicefee) {
+		this.servicefee = servicefee;
 	}
 
 }

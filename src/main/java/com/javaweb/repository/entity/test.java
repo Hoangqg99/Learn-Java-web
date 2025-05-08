@@ -10,18 +10,14 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "rentarea")
-public class RentAreaEntity {
+@Table(name = "test")
+public class test {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "value")
     private Integer value;
-
-    @ManyToOne
-    @JoinColumn(name = "buildingid")
-    private BuildingEntity buildingId;
 
     public Long getId() {
         return id;
@@ -37,14 +33,6 @@ public class RentAreaEntity {
 
     public void setValue(Integer value) {
         this.value = value;
-    }
-
-    public BuildingEntity getBuildingId() {
-        return buildingId;
-    }
-
-    public void setBuildingId(BuildingEntity buildingId) {
-        this.buildingId = buildingId;
     }
 
 }
