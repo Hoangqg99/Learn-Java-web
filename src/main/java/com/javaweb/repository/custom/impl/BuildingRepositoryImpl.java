@@ -151,3 +151,28 @@ public class BuildingRepositoryImpl implements BuildingRepositoryCustom {
         return null;
     }
 }
+
+// @Override
+// public void deleteById(Long id) {
+// // entityManager.remove(entityManager.find(BuildingEntity.class, id));
+// }
+
+// @Override
+// public void createBuilding(BuildingEntity buildingEntity) {
+// entityManager.persist(buildingEntity);
+// }
+
+// @Override
+// public void updateBuilding(BuildingEntity buildingEntity) {
+// entityManager.merge(buildingEntity);
+// }
+
+// @Override
+// public void deleteBuilding(long[] ids) {
+// for (long id : ids) {
+// BuildingEntity buildingEntity = entityManager.find(BuildingEntity.class, id);
+// if (buildingEntity != null) {
+// entityManager.remove(buildingEntity);
+// }
+// }
+// }
